@@ -695,8 +695,9 @@ func on_round_reset() -> void:
 ## One entity's whole status, for a client to draw.
 ##
 ## Per entity rather than all at once: effects are the one thing here that is genuinely
-## per-player and mostly private — an enemy's überCharge is public and their afterburn
-## is not — so who gets which is the game's decision, and a manager that only offered
+## per-player and mostly private — an enemy's invulnerability charge is public and their
+## afterburn is not — so who gets which is the game's decision, and a manager that only
+## offered
 ## "everything" would have made it.
 func to_wire(entity: int) -> Dictionary:
 	var state: DotEffectState = _states.get(entity, null)

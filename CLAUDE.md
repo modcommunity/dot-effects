@@ -1,8 +1,8 @@
 # dot-effects
 
 Status effects, incapacitation and temporary health. Burning, crits, invulnerability,
-slows, stuns and marks as **one document rather than one class each**; and Left 4 Dead's
-down-rather-than-dead, with the revive that is a decision.
+slows, stuns and marks as **one document rather than one class each**; and the
+co-operative shooters' down-rather-than-dead, with the revive that is a decision.
 
 **The distributable is `addons/dot_effects/`.** It requires [dot-core](../dot-core), a
 separate repository, and nothing else.
@@ -16,9 +16,10 @@ ln -s ../../dot-core/addons/dot_core addons/dot_core
 [dot-combat](../dot-combat) resolves one hit: a trace, a hitbox, a multiplier, a number
 subtracted from a `DotHealth`. Everything that happens *over time* to the entity on either
 end of that hit had nowhere to live, so every game reinvented it — and there is a lot of
-it. Team Fortress 2 alone has burning, bleeding, jarate, milk, crit-boost, mini-crit,
-überCharge, overheal, marked-for-death and stun; Left 4 Dead 2 has adrenaline, pills,
-incendiary, bile and being incapacitated.
+it. A class-based team shooter alone has burning, bleeding, blinding, dousing,
+crit-boost, mini-crit, invulnerability, overheal, marked-for-death and stun; a
+co-operative survival shooter has a stimulant, a heal-over-time, an incendiary, a lure
+and being incapacitated.
 
 Nineteen of those twenty-one are the **same six fields with different numbers**: a
 duration, a periodic amount, a multiplier on damage taken, a multiplier on damage dealt, a
@@ -82,8 +83,8 @@ multiplies by zero still records a hit and still fires a hit sound.
 ### 4. `may_block` is not `may_capture`, and the same rule applies here
 
 `DotObjectiveDef` has two questions for a reason and so does this: `no_capture` is separate
-from `no_attack`, because Team Fortress 2's invulnerable player may not capture, may not be
-hurt, and may absolutely still shoot.
+from `no_attack`, because the team shooters' invulnerable player may not capture, may not
+be hurt, and may absolutely still shoot.
 
 ### 5. Interaction is by tag, never by id
 
@@ -98,7 +99,7 @@ opposite of what it was applied for.
 ### 6. A cancelled revive throws its progress away
 
 Keeping it makes a revive something two players can chip at from cover, which removes the
-entire reason it is a decision. Left 4 Dead's number, and its reasoning.
+entire reason it is a decision. The co-operative shooters' number, and their reasoning.
 
 ### 7. A revive re-tests its own preconditions every tick
 
@@ -112,8 +113,9 @@ shape as dot-objective's defuse.
 machines expiring the same effect disagree by whatever their tick rates differ by.
 
 The wire form is **per entity** rather than everything at once, deliberately: effects are
-the one thing here that is genuinely per-player and mostly private — an enemy's überCharge
-is public and their afterburn is not — so who gets which is the game's decision. A manager
+the one thing here that is genuinely per-player and mostly private — an enemy's
+invulnerability charge is public and their afterburn is not — so who gets which is the
+game's decision. A manager
 that only offered "everything" would have made it.
 
 ## Two bugs found by running it
@@ -156,11 +158,11 @@ godot --headless --path . res://examples/effects_selftest.tscn   # 108 checks
 - **No particles, no sounds, no icons.** dot-ui's rule for dot-ui's reason. `label` and
   `tags` are what a HUD draws from.
 - **No health.** See above. This is the whole design.
-- **No classes.** A Team Fortress class is a loadout, a set of tunables and a health value
-  — dot-loadout, `DotFpsTunables` and dot-combat respectively. A "class" resource here
-  would be a fourth place to write the same three things.
+- **No classes.** A class in a class-based shooter is a loadout, a set of tunables and a
+  health value — dot-loadout, `DotFpsTunables` and dot-combat respectively. A "class"
+  resource here would be a fourth place to write the same three things.
 - **No cooldowns or charges.** When a player may *use* something is a weapon's business and
-  `DotWeaponState` has it.
+  dot-weapon's arsenal has it.
 - **No prediction.** Effects are server-authoritative and unpredicted, for dot-props'
   reason: a client that predicts its own crit and is wrong has shown the player a number
   that did not happen.

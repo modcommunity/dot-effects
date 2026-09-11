@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="dot-effects"
-config/description="Status effects, incapacitation and temporary health: burning, crits, invulnerability, slows and stuns as one document rather than one class each, and Left 4 Dead's down-rather-than-dead with the revive that is a decision."
+config/description="Status effects, incapacitation and temporary health: burning, crits, invulnerability, slows and stuns as one document rather than one class each, and the co-operative shooters' down-rather-than-dead with the revive that is a decision."
 run/main_scene="res://examples/effects_selftest.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"

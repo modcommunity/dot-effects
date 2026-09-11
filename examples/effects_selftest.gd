@@ -344,7 +344,7 @@ func _test_aggregate() -> void:
 	var _d1 := m.define(DotEffectDef.speed(&"slow_a", 0.5, 10 * RATE))
 	var _d2 := m.define(DotEffectDef.speed(&"slow_b", 0.5, 10 * RATE))
 	var _d3 := m.define(DotEffectDef.damage_buff(&"crit", 3.0, 10 * RATE))
-	var vuln := DotEffectDef.make(&"jarate", 10 * RATE)
+	var vuln := DotEffectDef.make(&"doused", 10 * RATE)
 	vuln.damage_taken_scale = 1.35
 	var _d4 := m.define(vuln)
 
@@ -357,7 +357,7 @@ func _test_aggregate() -> void:
 	)
 
 	var _c := m.apply(&"crit", 2)
-	var _v := m.apply(&"jarate", 3)
+	var _v := m.apply(&"doused", 3)
 	_check(
 		is_equal_approx(m.scale_damage(100.0, 2, 3), 100.0 * 3.0 * 1.35),
 		"an attacker's crit and a victim's vulnerability are one number to the thing "

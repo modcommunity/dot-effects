@@ -9,13 +9,15 @@ extends Resource
 ## A server can therefore check a game's whole effect table at boot, headless, which is
 ## the only moment anybody is watching.
 ##
-## [b]This is one document because the alternative is one class per effect.[/b] Team
-## Fortress 2 has burning, bleeding, jarate, milk, crit-boost, mini-crit, überCharge,
-## overheal, marked-for-death and stun; Left 4 Dead 2 has adrenaline, pills, incendiary,
-## bile and being incapacitated. Nineteen of those twenty-one are the same six fields
-## with different numbers — a duration, a periodic amount, a damage multiplier in each
-## direction, a movement multiplier and a flag — and writing them as classes is writing
-## the same file twenty times and then having them disagree.
+## [b]This is one document because the alternative is one class per effect.[/b] Count up
+## the status effects a class-based team shooter and a co-operative survival shooter ship
+## between them and you get about twenty-one: burning, bleeding, blinding, dousing,
+## crit-boost, mini-crit, invulnerability, overheal, marked-for-death, stun, a stimulant,
+## a heal-over-time, an incendiary and being incapacitated among them. Nineteen of the
+## twenty-one are the same six fields with different numbers — a duration, a periodic
+## amount, a damage multiplier in each direction, a movement multiplier and a flag — and
+## writing them as classes is writing the same file twenty times and then having them
+## disagree.
 ##
 ## [b]It never touches a health value.[/b] A periodic effect emits an amount and the
 ## game applies it to whatever it keeps health in — [DotHealth] in every game here.
@@ -71,7 +73,7 @@ enum Stacking {
 
 ## Ticks between periodic applications. Zero means every tick.
 ##
-## Team Fortress 2's afterburn is every half second; a healing beam is continuous. The
+## A team shooter's afterburn is every half second; a healing beam is continuous. The
 ## interval exists because "3 damage every 32 ticks" and "0.09 damage every tick" are
 ## different games: the first can be out-healed in bursts and the second cannot.
 @export_range(0, 100000, 1) var tick_interval: int = 32
@@ -94,8 +96,8 @@ enum Stacking {
 ## Multiplies damage this entity RECEIVES. 0 is immune, 2 is double.
 @export_range(0.0, 100.0, 0.01, "or_greater") var damage_taken_scale: float = 1.0
 
-## Multiplies damage this entity DEALS. Team Fortress 2's crit is 3, its mini-crit
-## 1.35.
+## Multiplies damage this entity DEALS. The team shooters put a crit at 3 and a
+## mini-crit at 1.35.
 @export_range(0.0, 100.0, 0.01, "or_greater") var damage_dealt_scale: float = 1.0
 
 ## Damage this entity deals ignores distance falloff.
@@ -113,7 +115,7 @@ enum Stacking {
 ## Multiplies the rate of fire.
 @export_range(0.0, 100.0, 0.01, "or_greater") var fire_rate_scale: float = 1.0
 
-## Refuses all damage while it lasts. überCharge.
+## Refuses all damage while it lasts. The team shooters' invulnerability charge.
 ##
 ## A flag rather than [member damage_taken_scale] = 0, because "immune" and "takes zero
 ## damage" differ where it matters: a game shows one and not the other, an objective
@@ -142,8 +144,8 @@ enum Stacking {
 
 ## Tags that may not be applied while this is active.
 ##
-## überCharge is immune to "debuff" and the effect table says so once, rather than
-## every debuff naming über.
+## An invulnerability charge is immune to "debuff" and the effect table says so once,
+## rather than every debuff naming the charge.
 @export var immune_to: PackedStringArray = PackedStringArray()
 
 ## Effects removed when this entity dies. Off for anything that should survive, which

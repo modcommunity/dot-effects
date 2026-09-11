@@ -4,9 +4,9 @@ extends DotConfig
 
 ## Every policy about effects in general, and the whole of the downed/revive half.
 ##
-## Layered like every [DotConfig] here. The downed numbers are Left 4 Dead 2's, because
-## being incapacitated rather than killed is that game's central mechanic and the values
-## are twenty years of playtesting away from obvious.
+## Layered like every [DotConfig] here. The downed numbers come from the co-operative
+## survival shooters, where being incapacitated rather than killed is the central
+## mechanic and the values are twenty years of playtesting away from obvious.
 
 @export_group("Limits")
 
@@ -28,13 +28,13 @@ extends DotConfig
 ## this is a mode's decision rather than an addon's.
 @export var downed_enabled: bool = false
 
-## The pool a downed entity bleeds through. Left 4 Dead 2's 300.
+## The pool a downed entity bleeds through. The co-operative shooters' 300.
 @export_range(1.0, 100000.0, 1.0, "or_greater") var downed_health: float = 300.0
 
 ## How fast it bleeds, per tick. 300 over about 90 seconds at 64 Hz.
 @export_range(0.0, 1000.0, 0.001, "or_greater") var downed_bleed_per_tick: float = 0.052
 
-## Ticks of uninterrupted reviving. Left 4 Dead 2's five seconds.
+## Ticks of uninterrupted reviving. The co-operative shooters' five seconds.
 @export_range(1, 100000, 1) var downed_revive_ticks: int = 320
 
 ## Health an entity comes back with.
@@ -45,13 +45,15 @@ extends DotConfig
 
 ## More than one reviver is faster.
 ##
-## Off, which is Left 4 Dead 2: a second player standing there is a second player not
-## shooting, and making it faster removes the decision. On, they share the work.
+## Off, as in the co-operative shooters: a second player standing there is a second
+## player not shooting, and making it faster removes the decision. On, they share the
+## work.
 @export var downed_revive_scales: bool = false
 
 ## How many times an entity may be revived before the next one kills them.
 ##
-## Two, which is Left 4 Dead's black-and-white. Zero means unlimited.
+## Two, the co-operative shooters' number: the third time down is the last, and the two
+## before it are what makes the second one frightening. Zero means unlimited.
 @export_range(0, 64, 1) var downed_max_incaps: int = 2
 
 ## Health a defibrillator-style revive from dead comes back with. Zero disables it.
@@ -61,8 +63,8 @@ extends DotConfig
 
 ## Health above the normal maximum decays at this rate per tick.
 ##
-## Team Fortress 2's overheal and Left 4 Dead's pills are the same mechanic: a number
-## that is real while you have it and cannot be kept. Zero means it never decays, which
+## A team shooter's overheal and a co-operative shooter's pills are the same mechanic: a
+## number that is real while you have it and cannot be kept. Zero means it never decays, which
 ## is what a game with a hard overheal cap and no decay wants.
 @export_range(0.0, 1000.0, 0.0001, "or_greater") var temp_decay_per_tick: float = 0.1
 

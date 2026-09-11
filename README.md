@@ -1,4 +1,4 @@
-This is the **effects** asset for TMC's **Dot** collection. It adds status effects — burning, crits, invulnerability, slows, stuns, marks — plus temporary health and incapacitation, where a player at zero health becomes a decision for their team rather than a respawn timer.
+This is the **effects** asset for TMC's **Dot** collection. It adds status effects such as burning, crits, invulnerability, slows, stuns and marks. It also adds temporary health, and incapacitation: a player who reaches zero health goes down instead of dying, and a teammate can pick them back up.
 
 This collection of assets provides modular building blocks for creating games and applications within the TMC ecosystem, ensuring consistency and interoperability across all `dot-*` assets. This includes core functionality, networking, authentication, cloud integration, and more.
 
@@ -13,7 +13,7 @@ I intend on reviewing code, testing, and editing documentation regularly. If you
 
 ## One document, not twenty classes
 
-Count up the status effects a team shooter and a co-operative shooter ship between them and you get about twenty-one: burning, bleeding, blinding, dousing, crit-boost, mini-crit, invulnerability, overheal, marked-for-death, stun, a stimulant, a heal-over-time, an incendiary and being incapacitated among them. Nineteen of the twenty-one are the same six fields with different numbers — a duration, a periodic amount, a multiplier on damage taken, a multiplier on damage dealt, a multiplier on movement, and a flag.
+Count up the status effects a team shooter and a co-operative shooter ship between them and you get about twenty-one: burning, bleeding, blinding, dousing, crit-boost, mini-crit, invulnerability, overheal, marked-for-death, stun, a stimulant, a heal-over-time, an incendiary and being incapacitated among them. Nineteen of the twenty-one are the same six fields with different numbers: a duration, a periodic amount, a multiplier on damage taken, a multiplier on damage dealt, a multiplier on movement, and a flag.
 
 ```gdscript
 effects.define(DotEffectDef.burning(&"afterburn", 3.0, 10 * 64))
@@ -31,7 +31,7 @@ effects.damaged.connect(func(entity, amount, type, source):
     health_of(entity).apply(DotDamage.make(amount, type, source, tick)))
 ```
 
-That is what lets a slow, a stun and a speed boost work in a game with no damage system at all — and it means an afterburn tick goes through the same lag compensation, armour and friendly-fire rules as every other hit, because it *is* every other hit.
+That is what lets a slow, a stun and a speed boost work in a game with no damage system at all. It also means an afterburn tick goes through the same lag compensation, armour and friendly-fire rules as every other hit, because it *is* every other hit.
 
 ## Down rather than dead
 
@@ -46,7 +46,7 @@ else:
     player.die()
 ```
 
-A downed player bleeds out over ninety seconds, is picked up in five, comes back with 30 health, and the third time is the last. A cancelled revive throws its progress away — keeping it makes a revive something two players chip at from cover, which removes the whole reason it is a decision.
+A downed player bleeds out over ninety seconds, is picked up in five, comes back with 30 health, and the third time is the last. A cancelled revive throws its progress away. If progress were kept, two players could chip at a revive a second at a time from behind cover, and the cost of a revive is meant to be a stretch of time where somebody is not shooting.
 
 ## Installing
 

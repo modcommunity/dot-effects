@@ -56,7 +56,8 @@ func remaining(tick: int) -> int:
 
 
 ## 0..1 of the way through. 0 for one that does not expire, which a HUD draws as a
-## full bar rather than an empty one — the opposite convention loses überCharge.
+## full bar rather than an empty one — the opposite convention loses an invulnerability
+## charge.
 func elapsed_fraction(tick: int) -> float:
 	if expires_at < 0 or def == null or def.duration_ticks <= 0:
 		return 0.0

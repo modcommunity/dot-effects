@@ -3,10 +3,10 @@ extends RefCounted
 
 ## One entity, down rather than dead, and how they get back up.
 ##
-## Left 4 Dead 2's incapacitation, which is the mechanic that turns a shooter into a
-## co-operative game: a player at zero health becomes a **decision** for their team
-## rather than a respawn timer, and the fifteen seconds somebody spends picking them up
-## is fifteen seconds nobody is shooting.
+## Incapacitation, the mechanic that turns a shooter into a co-operative game: a player
+## at zero health becomes a **decision** for their team rather than a respawn timer, and
+## the fifteen seconds somebody spends picking them up is fifteen seconds nobody is
+## shooting.
 ##
 ## [b]The reviving is deliberately not an effect.[/b] Every other status here is a
 ## multiplier and a duration; this one is a two-party interaction with a distance test,
