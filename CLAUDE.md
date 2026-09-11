@@ -116,13 +116,30 @@ the one thing here that is genuinely per-player and mostly private — an enemy'
 is public and their afterburn is not — so who gets which is the game's decision. A manager
 that only offered "everything" would have made it.
 
-## The bug found by running it
+## Two bugs found by running it
 
 **`on_death()` read the downed dictionary directly instead of creating on demand**, so an
 entity that had never been *down* was never recorded as *dead* — and a defibrillator could
 not bring back the one player who went straight from full health to a rocket, which is most
 of them. Every other accessor in the class creates on demand; this one did not, and nothing
 errored, because "not dead" is a legitimate thing for an entity to be.
+
+**Three of the eight aggregates had no facade on the manager.** `DotEffectState` computes
+`jump_scale`, `fire_rate_scale` and `may_jump` on every mutation alongside the five that
+`DotEffectManager` forwards — and a game holds a manager, never a state, so those three
+were reachable only by going round the facade through `state_of()`. `no_jump` is an
+exported field of `DotEffectDef`, it is aggregated, and it crosses the wire; the one thing
+missing was the question.
+
+**The asymmetry is worse than the absence would have been.** Somebody who wires
+`may_move` off the manager — which every consumer does — and then looks for `may_jump`
+beside it finds nothing and concludes this addon has no such concept. That is how a
+documented field ends up read by nobody without anything ever failing.
+
+Found by the family's mechanical detector run over methods rather than settings, and it
+is a variant worth naming: not "declared and called by nothing", but **declared on the
+inner object and not on the one anybody holds.** The suite now asks for all eight through
+the manager, which is the object under test.
 
 ## Validating
 

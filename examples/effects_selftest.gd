@@ -382,6 +382,31 @@ func _test_aggregate() -> void:
 	_check(not m.may_move(4), "and movement")
 	_check(m.may_attack(5), "and an entity with nothing on it may do everything")
 
+	# Every aggregate the state computes is asked for THROUGH THE MANAGER here, because
+	# that is the object a game holds. jump and fire rate had no facade at all and were
+	# reachable only by going round it via state_of().
+	var hobble := DotEffectDef.make(&"hobble", 10 * RATE)
+	hobble.no_jump = true
+	hobble.jump_scale = 0.5
+	hobble.fire_rate_scale = 0.25
+	var _d7 := m.define(hobble)
+	var _h := m.apply(&"hobble", 6)
+	_check(not m.may_jump(6), "an effect that forbids jumping is visible on the manager")
+	_check(m.may_move(6), "and does not stop them walking")
+	_check(is_equal_approx(m.jump_scale(6), 0.5), "so is the jump scale")
+	_check(is_equal_approx(m.fire_rate_scale(6), 0.25), "and the fire rate")
+	_check(m.may_jump(5), "an entity with nothing on it may jump")
+	_check(is_equal_approx(m.jump_scale(5), 1.0), "and jumps at full height")
+	_check(is_equal_approx(m.fire_rate_scale(5), 1.0), "and fires at full rate")
+
+	# A downed player may not jump, for the same reason they may not move — which is
+	# the half of may_jump that is not on the state at all.
+	m.rules.downed_enabled = true
+	var _z := m.report_zero_health(7, 1)
+	_check(m.is_down(7), "a player at zero health goes down")
+	_check(not m.may_jump(7), "and a downed player may not jump")
+	_check(not m.may_move(7), "nor move")
+
 	m.queue_free()
 
 

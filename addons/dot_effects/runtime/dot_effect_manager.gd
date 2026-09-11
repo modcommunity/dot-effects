@@ -335,6 +335,29 @@ func may_move(entity: int) -> bool:
 	return not is_down(entity)
 
 
+## [b]The three below are on the state and were once only on the state.[/b] A game holds
+## a manager, not a [DotEffectState], so an aggregate with no facade here is one that is
+## recomputed on every mutation and asked for by nobody — and the asymmetry is worse than
+## the absence: somebody who wires [method may_move] from the manager and then looks for
+## [method may_jump] beside it concludes this addon has no such concept, when the field,
+## the aggregation and the wire format have all been carrying it the whole time.
+func may_jump(entity: int) -> bool:
+	var state: DotEffectState = _states.get(entity, null)
+	if state != null and not state.may_jump():
+		return false
+	return not is_down(entity)
+
+
+func jump_scale(entity: int) -> float:
+	var state: DotEffectState = _states.get(entity, null)
+	return state.jump_scale() if state != null else 1.0
+
+
+func fire_rate_scale(entity: int) -> float:
+	var state: DotEffectState = _states.get(entity, null)
+	return state.fire_rate_scale() if state != null else 1.0
+
+
 ## The one call a damage resolver wants: how much of this actually lands.
 ##
 ## Pointed at [member DotDamageResolver.adjust] in every game here, which is why it
