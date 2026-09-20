@@ -56,6 +56,6 @@ Copy `addons/dot_effects/` and [`dot-core`](https://github.com/modcommunity/dot-
 
 [dot-core](https://github.com/modcommunity/dot-core). Nothing else.
 
-## License
+## Licence
 
-MIT.
+MIT. See [LICENSE](LICENSE).
