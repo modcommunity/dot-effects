@@ -77,7 +77,7 @@ func env_prefix() -> String:
 
 
 func cli_prefix() -> String:
-	return "effects-"
+	return "--effects-"
 
 
 func validate() -> DotResult:
