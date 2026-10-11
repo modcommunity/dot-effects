@@ -12,4 +12,4 @@ Bugs found by running it, kept because each could come back. The live rule from 
 
 The asymmetry is worse than the absence would have been. Somebody who wires `may_move` off the manager and then looks for `may_jump` beside it finds nothing and concludes this addon has no such concept. That is how a documented field ends up read by nobody without anything ever failing.
 
-Found by the family's mechanical detector run over methods rather than settings ([detectors](../../../docs/detectors.md)), and it is a variant worth naming: not "declared and called by nothing", but declared on the inner object and not on the one anybody holds. `ignores_falloff` is the same shape and is still open (see [CLAUDE.md](../CLAUDE.md#open)).
+Found by the family's mechanical detector run over methods rather than settings ([detectors](../../../docs/detectors.md)), and it is a variant worth naming: not "declared and called by nothing", but declared on the inner object and not on the one anybody holds. `ignores_falloff` was the same shape and was closed the same way on 2026-10-10.
