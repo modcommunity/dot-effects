@@ -45,6 +45,5 @@ The family's two steps ([game-dev/CLAUDE.md](../../CLAUDE.md#validating-anything
 
 ## Open
 
-- **`ignores_falloff` has no manager facade.** `DotEffectState.ignores_falloff()` is aggregated (and set by `DotEffectDef.damage_buff` at a scale of 2 or more) but `DotEffectManager` does not forward it, so a game can reach it only through `state_of()`. Not yet added; the same shape as the [history](docs/history.md#three-aggregates-had-no-facade-on-the-manager) bug.
 
 Deliberately not here: particles, sounds, icons, health, classes, cooldowns, prediction. [design](docs/design.md#deliberately-not-here)

@@ -335,7 +335,7 @@ func may_move(entity: int) -> bool:
 	return not is_down(entity)
 
 
-## [b]The three below are on the state and were once only on the state.[/b] A game holds
+## [b]These, and [method ignores_falloff] below, are on the state and were once only on the state.[/b] A game holds
 ## a manager, not a [DotEffectState], so an aggregate with no facade here is one that is
 ## recomputed on every mutation and asked for by nobody — and the asymmetry is worse than
 ## the absence: somebody who wires [method may_move] from the manager and then looks for
@@ -356,6 +356,14 @@ func jump_scale(entity: int) -> float:
 func fire_rate_scale(entity: int) -> float:
 	var state: DotEffectState = _states.get(entity, null)
 	return state.fire_rate_scale() if state != null else 1.0
+
+
+## Whether this entity's attacks ignore damage falloff with distance (a strong damage
+## buff sets it). The last aggregate that was only on [DotEffectState]: see the note
+## above [method may_jump] for why every one needs a facade here.
+func ignores_falloff(entity: int) -> bool:
+	var state: DotEffectState = _states.get(entity, null)
+	return state != null and state.ignores_falloff()
 
 
 ## The one call a damage resolver wants: how much of this actually lands.

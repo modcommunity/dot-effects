@@ -13,7 +13,7 @@ extends Node
 ## [/codeblock]
 
 const SECTIONS := 12
-const CHECKS := 118
+const CHECKS := 120
 
 const RATE := 64
 
@@ -408,6 +408,12 @@ func _test_aggregate() -> void:
 	_check(m.may_jump(5), "an entity with nothing on it may jump")
 	_check(is_equal_approx(m.jump_scale(5), 1.0), "and jumps at full height")
 	_check(is_equal_approx(m.fire_rate_scale(5), 1.0), "and fires at full rate")
+	_check(not m.ignores_falloff(5), "and their damage falls off with distance")
+	var rage := DotEffectDef.make(&"rage", 10 * RATE)
+	rage.ignores_falloff = true
+	var _d8 := m.define(rage)
+	var _r := m.apply(&"rage", 8)
+	_check(m.ignores_falloff(8), "an effect that ignores falloff is visible on the manager too")
 
 	# A downed player may not jump, for the same reason they may not move — which is
 	# the half of may_jump that is not on the state at all.
