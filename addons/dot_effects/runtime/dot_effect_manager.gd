@@ -416,7 +416,7 @@ func report_zero_health(entity: int, tick: int = -1) -> DotResult:
 	d.state = DotDowned.State.DOWN
 	d.health = rules.downed_health
 	d.progress = 0.0
-	d.reviver = 0
+	d.clear_revivers()
 	d.incaps += 1
 	d.down_at = at
 	downed.emit(entity, d.incaps)
@@ -426,7 +426,7 @@ func report_zero_health(entity: int, tick: int = -1) -> DotResult:
 func _kill(d: DotDowned, reason: StringName) -> DotResult:
 	d.state = DotDowned.State.DEAD
 	d.health = 0.0
-	d.reviver = 0
+	d.clear_revivers()
 	d.progress = 0.0
 	died.emit(d.entity, reason)
 	return DotResult.success(&"dead")
@@ -457,14 +457,41 @@ func begin_revive(entity: int, by: int) -> DotResult:
 	if not near.ok:
 		return near
 
-	if d.state == DotDowned.State.REVIVING and d.reviver == by:
+	if d.state == DotDowned.State.REVIVING and (d.reviver == by or d.helpers.has(by)):
+		return DotResult.success(null)
+
+	# A second pair of hands joins the revive when the rules say it counts. Before, the
+	# second begin_revive replaced the first reviver and `revivers` stayed 1, so
+	# downed_revive_scales could never do anything.
+	if d.state == DotDowned.State.REVIVING and rules.downed_revive_scales:
+		d.helpers.append(by)
+		d.revivers = 1 + d.helpers.size()
+		revive_started.emit(entity, by)
 		return DotResult.success(null)
 
 	d.state = DotDowned.State.REVIVING
+	d.clear_revivers()
 	d.reviver = by
-	d.revivers = 1
 	revive_started.emit(entity, by)
 	return DotResult.success(null)
+
+
+## One reviver lets go, the others carry on: a helper leaves, or the reviver hands over to
+## the first helper. With nobody left it is [method cancel_revive].
+func leave_revive(entity: int, by: int, reason: StringName = &"cancelled") -> void:
+	var d: DotDowned = _downed.get(entity, null)
+	if d == null or d.state != DotDowned.State.REVIVING:
+		return
+	if d.helpers.has(by):
+		d.helpers.erase(by)
+	elif d.reviver == by and not d.helpers.is_empty():
+		d.reviver = d.helpers.pop_front()
+	elif d.reviver == by:
+		cancel_revive(entity, reason)
+		return
+	else:
+		return
+	d.revivers = 1 + d.helpers.size()
 
 
 func cancel_revive(entity: int, reason: StringName = &"cancelled") -> void:
@@ -472,7 +499,7 @@ func cancel_revive(entity: int, reason: StringName = &"cancelled") -> void:
 	if d == null or d.state != DotDowned.State.REVIVING:
 		return
 	d.state = DotDowned.State.DOWN
-	d.reviver = 0
+	d.clear_revivers()
 	# The progress is deliberately thrown away. Keeping it makes a revive something two
 	# players can chip at from cover, which removes the whole reason it is a decision.
 	d.progress = 0.0
@@ -491,7 +518,7 @@ func defibrillate(entity: int, by: int = 0) -> DotResult:
 	d.state = DotDowned.State.UP
 	d.health = 0.0
 	d.progress = 0.0
-	d.reviver = 0
+	d.clear_revivers()
 	revived.emit(entity, by, rules.downed_defib_health)
 	return DotResult.success(rules.downed_defib_health)
 
@@ -504,7 +531,7 @@ func stand_up(entity: int, reset_incaps: bool = false) -> void:
 	d.state = DotDowned.State.UP
 	d.health = 0.0
 	d.progress = 0.0
-	d.reviver = 0
+	d.clear_revivers()
 	if reset_incaps:
 		d.incaps = 0
 
@@ -610,8 +637,16 @@ func _advance_downed(tick: int) -> void:
 			# Re-tested every tick rather than trusted: a reviver who died, walked away
 			# or went down themselves must stop reviving, and a game that only calls
 			# cancel_revive() from its death handler has one path to get wrong.
+			for helper: int in d.helpers.duplicate():
+				if not _within_revive_range(helper, int(entity)).ok or is_down(helper):
+					leave_revive(int(entity), helper)
 			var still := _within_revive_range(d.reviver, int(entity))
 			var reviver_down := is_down(d.reviver)
+			if (not still.ok or reviver_down) and not d.helpers.is_empty():
+				# The reviver went, somebody else is still holding: they carry on.
+				leave_revive(int(entity), d.reviver)
+				still = DotResult.success(null)
+				reviver_down = false
 			if not still.ok or reviver_down:
 				cancel_revive(int(entity), &"interrupted" if reviver_down else &"moved")
 			else:
@@ -621,7 +656,7 @@ func _advance_downed(tick: int) -> void:
 					var by := d.reviver
 					d.state = DotDowned.State.UP
 					d.progress = 0.0
-					d.reviver = 0
+					d.clear_revivers()
 					d.health = 0.0
 					revived.emit(int(entity), by, rules.downed_revive_health)
 					continue
@@ -671,7 +706,7 @@ func on_death(entity: int) -> void:
 	if rules.downed_enabled:
 		var d := downed_state(entity)
 		d.state = DotDowned.State.DEAD
-		d.reviver = 0
+		d.clear_revivers()
 		d.progress = 0.0
 
 
@@ -692,7 +727,7 @@ func on_round_reset() -> void:
 		d.state = DotDowned.State.UP
 		d.health = 0.0
 		d.progress = 0.0
-		d.reviver = 0
+		d.clear_revivers()
 		d.incaps = 0
 	_temp.clear()
 	_temp_at.clear()

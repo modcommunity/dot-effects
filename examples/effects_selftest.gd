@@ -13,7 +13,7 @@ extends Node
 ## [/codeblock]
 
 const SECTIONS := 12
-const CHECKS := 120
+const CHECKS := 124
 
 const RATE := 64
 
@@ -616,6 +616,34 @@ func _test_revive() -> void:
 		not m.begin_revive(4, 2).ok,
 		"and cannot start again while they are down"
 	)
+
+	# Two pairs of hands, when the rules say they count. Before, a second begin_revive
+	# replaced the first reviver and `revivers` stayed 1: downed_revive_scales did nothing.
+	var shared := _manager(true)
+	shared.rules.downed_revive_scales = true
+	var spots := {1: Vector3.ZERO, 2: Vector3.ZERO, 3: Vector3.ZERO}
+	shared.position_fn = func(e: int) -> Vector3: return spots.get(e, Vector3.ZERO)
+	var _s1 := shared.report_zero_health(1)
+	var _s2 := shared.begin_revive(1, 2)
+	_check(shared.begin_revive(1, 3).ok and shared.downed_state(1).revivers == 2,
+		"under downed_revive_scales a second reviver joins rather than replacing the first")
+	var half := shared.rules.downed_revive_ticks / 2
+	for t in range(1, half + 2):
+		shared.advance(t)
+	_check(not shared.is_down(1), "and two finish in half the time")
+
+	var _s3 := shared.report_zero_health(1)
+	var _s4 := shared.begin_revive(1, 2)
+	var _s5 := shared.begin_revive(1, 3)
+	spots[2] = Vector3(100, 0, 0)
+	shared.advance(half + 3)
+	var left := shared.downed_state(1)
+	_check(left.state == DotDowned.State.REVIVING and left.reviver == 3 and left.revivers == 1,
+		"when the reviver walks off, the one still holding carries on alone")
+	shared.leave_revive(1, 3)
+	_check(shared.downed_state(1).state == DotDowned.State.DOWN,
+		"and when the last one lets go the revive stops")
+	shared.queue_free()
 
 	# Defibrillation.
 	m.stand_up(5, true)

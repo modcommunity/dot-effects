@@ -108,7 +108,7 @@ DOT_EFFECTS_DOWNED_ENABLED=true godot --headless -- --effects-downed-max-incaps=
 | `downed_revive_ticks` | 320 | How long a revive takes (5 seconds) |
 | `downed_revive_health` | 30 | Health a revived player comes back with |
 | `downed_revive_radius` | 2.0 | How close the reviver must stay. 0 skips the check |
-| `downed_revive_scales` | false | More revivers make it faster |
+| `downed_revive_scales` | false | More revivers make it faster: a second `begin_revive` joins instead of replacing, `leave_revive(entity, by)` lets one go and the rest carry on |
 | `downed_max_incaps` | 2 | Revives before the next down is death. 0 is unlimited |
 | `downed_defib_health` | 50 | Health after `defibrillate()`. 0 turns it off |
 | `temp_decay_per_tick` | 0.1 | How fast temporary health drains. 0 keeps it |

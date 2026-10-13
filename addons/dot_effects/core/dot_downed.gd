@@ -31,8 +31,20 @@ var health: float = 0.0
 ## Who is picking them up. Zero when nobody.
 var reviver: int = 0
 
-## How many revivers are on it, when the rules say that matters.
+## How many revivers are on it, when the rules say that matters: [member reviver] and
+## [member helpers].
 var revivers: int = 1
+
+## Who else is reviving alongside [member reviver], under
+## [member DotEffectRules.downed_revive_scales]. Empty otherwise.
+var helpers: Array[int] = []
+
+
+## Nobody reviving: the reviver, the helpers and the count, together.
+func clear_revivers() -> void:
+	reviver = 0
+	helpers.clear()
+	revivers = 1
 
 ## Ticks of reviving done so far.
 var progress: float = 0.0
