@@ -10,7 +10,9 @@ extends Node
 ## add_child(effects)
 ##
 ## effects.damaged.connect(func(entity, amount, type, source):
-##     health_of(entity).apply(DotDamage.make(amount, type, source, tick)))
+##     var d := DotDamage.make(source, entity, amount, combat.damage_type(type))
+##     d.tick = tick
+##     health_of(entity).apply(d))
 ##
 ## # ... once per physics tick:
 ## effects.advance(tick)
