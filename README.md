@@ -83,7 +83,7 @@ else:
     player.die()
 ```
 
-A downed player bleeds out over about 90 seconds. A teammate who holds revive on them for 5 seconds (`begin_revive(entity, by)`) brings them back with 30 health, and moving away or being downed cancels it and loses the progress. The third time down is death. `position_fn` and `allies_fn` let the manager check that the reviver is close enough and on the same side. `defibrillate()` brings somebody back from dead.
+A downed player bleeds out over about 90 seconds. A teammate who holds revive on them for 5 seconds (`begin_revive(entity, by)`) brings them back with 30 health, and moving away or being downed cancels it and loses the progress. The bleed-out pool keeps draining while a revive is held (a rescue started in the last seconds is a gamble). The third time down is death. `position_fn` and `allies_fn` let the manager check that the reviver is close enough and on the same side. `defibrillate()` brings somebody back from dead.
 
 ## Settings
 The rules live in a `DotEffectRules` resource, set on the manager's `rules` (it makes a default one if you do not). Like every Dot config it is layered: inspector defaults, then a JSON file, then the environment, then the command line. Call `load_layered()` on it before `setup()` to apply them:

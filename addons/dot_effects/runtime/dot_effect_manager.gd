@@ -663,6 +663,14 @@ func _advance_downed(tick: int) -> void:
 					revived.emit(int(entity), by, rules.downed_revive_health)
 					continue
 
+		# Intended: the pool drains while a revive is under way too (this line is reached
+		# on the REVIVING path as well). A revive is a 5 s hold against a 90 s pool, so
+		# the drain costs a rescuer almost nothing, but it is what makes starting a revive
+		# in the last seconds a gamble, and since cancel_revive() throws progress away,
+		# pausing the pool would let anyone start, stop and retry for free. A revive that
+		# completes `continue`s above before reaching here, so it never bleeds on the
+		# tick it finishes. A game that wants a paused pool is a rules flag to add, not a
+		# reason to guess here.
 		d.health -= rules.downed_bleed_per_tick
 		if d.health <= 0.0:
 			var _res := _kill(d, &"bled_out")
