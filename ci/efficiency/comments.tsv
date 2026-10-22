@@ -1,0 +1,13 @@
+# comments
+# Baselines only shrink: scripts/<gate> --update lowers or drops entries and refuses to add.
+addons/dot_effects/core/dot_downed.gd::long_block	2
+addons/dot_effects/core/dot_effect_def.gd::long_block	8
+addons/dot_effects/core/dot_effect_instance.gd::long_block	1
+addons/dot_effects/core/dot_effect_rules.gd::long_block	6
+addons/dot_effects/core/dot_effect_state.gd::banner	1
+addons/dot_effects/core/dot_effect_state.gd::long_block	2
+addons/dot_effects/dot_effects_plugin.gd::long_block	1
+addons/dot_effects/runtime/dot_effect_manager.gd::banner	7
+addons/dot_effects/runtime/dot_effect_manager.gd::long_block	9
+examples/effects_selftest.gd::banner	5
+examples/effects_selftest.gd::long_block	1

@@ -1,0 +1,4 @@
+# size
+# Baselines only shrink: scripts/<gate> --update lowers or drops entries and refuses to add.
+addons/dot_effects/runtime/dot_effect_manager.gd	842
+examples/effects_selftest.gd::_test_revive	106
