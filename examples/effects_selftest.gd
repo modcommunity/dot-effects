@@ -12,8 +12,8 @@ extends Node
 ## godot --headless --path . res://examples/effects_selftest.tscn
 ## [/codeblock]
 
-const SECTIONS := 12
-const CHECKS := 124
+const SECTIONS := 13
+const CHECKS := 133
 
 const RATE := 64
 
@@ -43,6 +43,7 @@ func _run() -> void:
 	_test_revive()
 	_test_temp_health()
 	_test_wire_and_mirror()
+	_test_stack_scale()
 
 	_line("")
 	_line("%d sections, %d passed, %d failed" % [_section_count, _passed, _failed])
@@ -753,6 +754,19 @@ func _test_wire_and_mirror() -> void:
 
 	m.queue_free()
 	mirror.queue_free()
+
+
+func _test_stack_scale() -> void:
+	_section("stack scale")
+	_check(is_equal_approx(DotStackScale.ramp(2.0, 0.5, 5.0, 0), 2.0), "no stacks: the base")
+	_check(is_equal_approx(DotStackScale.ramp(2.0, 0.5, 5.0, 3), 3.5), "three stacks: base plus three steps")
+	_check(is_equal_approx(DotStackScale.ramp(2.0, 0.5, 5.0, 99), 5.0), "any number of stacks stops at the cap")
+	_check(is_equal_approx(DotStackScale.ramp(2.0, 0.5, 5.0, -4), 2.0), "negative stacks count as none")
+	_check(is_equal_approx(DotStackScale.fade_alpha(0, 0.1, 0.3), 1.0), "no stacks: solid")
+	_check(is_equal_approx(DotStackScale.fade_alpha(3, 0.1, 0.3), 0.7), "three stacks: 1 - 3 * step")
+	_check(is_equal_approx(DotStackScale.fade_alpha(40, 0.1, 0.3), 0.3), "stops at the minimum alpha")
+	_check(DotStackScale.fade_alpha(99, 0.5, 0.0) >= DotStackScale.ALPHA_FLOOR, "a minimum of 0 still leaves it visible")
+	_check(is_equal_approx(DotStackScale.fade_alpha(5, -1.0, 0.3), 1.0), "a negative step never darkens the other way")
 
 
 # --- Harness ---------------------------------------------------------------

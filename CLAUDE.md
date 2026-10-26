@@ -22,6 +22,7 @@ Read the family [CLAUDE.md](../../CLAUDE.md) first.
 | `core/dot_effect_state.gd` | `DotEffectState`: everything on one entity and its aggregate (`recompute`) |
 | `core/dot_effect_rules.gd` | `DotEffectRules`: limits, temporary health, the downed/revive half; layered `DotConfig` |
 | `core/dot_downed.gd` | `DotDowned`: one entity, down rather than dead |
+| `core/dot_stack_scale.gd` | `DotStackScale`: `ramp` (base plus a step per stack, capped) and `fade_alpha` (solid down to a visible floor); pure arithmetic a game feeds its own cvars |
 | `runtime/dot_effect_manager.gd` | `DotEffectManager`: the one node a game holds; queries, `damaged`, `on_death`, `report_zero_health`, wire form |
 | `examples/effects_selftest.tscn` | the suite |
 
