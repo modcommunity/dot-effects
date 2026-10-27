@@ -17,12 +17,14 @@ Read the family [CLAUDE.md](../../CLAUDE.md) first.
 
 | Path | What |
 | --- | --- |
-| `core/dot_effect_def.gd` | `DotEffectDef`: the document (duration, periodic amount, scales, flags, `tags`, `cures`, `immune_to`) and stock constructors |
+| `core/dot_effect_def.gd` | `DotEffectDef`: the document (duration, periodic amount, scales, flags, `tags`, `cures`, `immune_to`) and stock constructors (`screen_impair`: a stacking status a screen overlay reads) |
 | `core/dot_effect_instance.gd` | `DotEffectInstance`: one application to one entity |
 | `core/dot_effect_state.gd` | `DotEffectState`: everything on one entity and its aggregate (`recompute`) |
 | `core/dot_effect_rules.gd` | `DotEffectRules`: limits, temporary health, the downed/revive half; layered `DotConfig` |
 | `core/dot_downed.gd` | `DotDowned`: one entity, down rather than dead |
 | `core/dot_stack_scale.gd` | `DotStackScale`: `ramp` (base plus a step per stack, capped) and `fade_alpha` (solid down to a visible floor); pure arithmetic a game feeds its own cvars |
+| `core/dot_hazard_profile.gd` | `DotHazardProfile`: one ground hazard as a document (radius, lifetime, dps and ramp, tick interval, slow, fade, colour, per-owner and global caps, trail spacing); `KEYS` lists the clampable values a game publishes as cvars or dot-profile keys, `from_values` reads them |
+| `runtime/dot_hazard_pool.gd` | `DotHazardPool`: puddles of acid, goo or oil. Damage leaves through `damage_sink`, who is inside comes from `occupants`; caps evict the oldest; `trail()` drops puddles behind a moving owner; clients draw from `added`/`ended`. Zombie Zone's acid runs on it |
 | `runtime/dot_effect_manager.gd` | `DotEffectManager`: the one node a game holds; queries, `damaged`, `on_death`, `report_zero_health`, wire form |
 | `examples/effects_selftest.tscn` | the suite |
 

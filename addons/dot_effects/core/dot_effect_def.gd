@@ -193,6 +193,16 @@ static func invulnerability(p_id: StringName, ticks: int) -> DotEffectDef:
 	return d
 
 
+## Goo, ink or smoke over the victim's screen. Each application stacks up to [param stacks]; a client mirror reads
+## the stack count and remaining time (tag `screen_impair`) and feeds them to a screen overlay.
+static func screen_impair(p_id: StringName, ticks: int, stacks: int = 3) -> DotEffectDef:
+	var d := make(p_id, ticks)
+	d.tags = PackedStringArray(["debuff", "screen_impair"])
+	d.stacking = Stacking.STACK
+	d.max_stacks = stacks
+	return d
+
+
 ## A movement multiplier. Adrenaline, a slow, concrete boots.
 static func speed(p_id: StringName, scale: float, ticks: int) -> DotEffectDef:
 	var d := make(p_id, ticks)

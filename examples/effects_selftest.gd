@@ -12,8 +12,8 @@ extends Node
 ## godot --headless --path . res://examples/effects_selftest.tscn
 ## [/codeblock]
 
-const SECTIONS := 13
-const CHECKS := 133
+const SECTIONS := 14
+const CHECKS := 148
 
 const RATE := 64
 
@@ -44,6 +44,7 @@ func _run() -> void:
 	_test_temp_health()
 	_test_wire_and_mirror()
 	_test_stack_scale()
+	_test_hazard_pool()
 
 	_line("")
 	_line("%d sections, %d passed, %d failed" % [_section_count, _passed, _failed])
@@ -767,6 +768,87 @@ func _test_stack_scale() -> void:
 	_check(is_equal_approx(DotStackScale.fade_alpha(40, 0.1, 0.3), 0.3), "stops at the minimum alpha")
 	_check(DotStackScale.fade_alpha(99, 0.5, 0.0) >= DotStackScale.ALPHA_FLOOR, "a minimum of 0 still leaves it visible")
 	_check(is_equal_approx(DotStackScale.fade_alpha(5, -1.0, 0.3), 1.0), "a negative step never darkens the other way")
+
+
+# --- Hazard pool ------------------------------------------------------------
+
+func _test_hazard_pool() -> void:
+	_section("hazard pool: damage only inside, ramp, cap, lifetime, trail, slow")
+	var profile := DotHazardProfile.new()
+	profile.kind = &"goo"
+	profile.radius = 2.0
+	profile.seconds = 4.0
+	profile.dps = 10.0
+	profile.dps_start = 10.0
+	profile.ramp_seconds = 0.0
+	profile.grow_seconds = 0.0
+	profile.slow_factor = 0.5
+	profile.fade_seconds = 2.0
+	profile.max_per_owner = 2
+	profile.global_cap = 3
+	profile.trail_spacing = 2.0
+	profile.trail_interval = 0.5
+	profile.trail_radius = 1.0
+	profile.trail_seconds = 2.0
+
+	var victims := {1: Vector3(0.5, 0, 0), 2: Vector3(9, 0, 0)}
+	var paid := {}
+	var pool := DotHazardPool.new()
+	pool.occupants = func(at: Vector3, radius: float, _reach: float) -> Array:
+		var out := []
+		for v: int in victims:
+			if (victims[v] as Vector3).distance_to(at) <= radius:
+				out.append(v)
+		return out
+	pool.damage_sink = func(v: int, amount: float, _o: int, _k: StringName) -> void:
+		paid[v] = float(paid.get(v, 0.0)) + amount
+	var events := []
+	pool.added.connect(func(id: int, _k: StringName, _a: Vector3, _r: float, _s: float) -> void: events.append(id))
+	pool.ended.connect(func(id: int) -> void: events.append(-id))
+
+	var id := pool.add(profile, Vector3.ZERO, 0.0, 7)
+	_check(events == [id], "a puddle is announced once when laid")
+	for i in range(10):
+		pool.tick(0.1 * float(i + 1), 0.1)
+	_check(is_equal_approx(float(paid.get(1, 0.0)), 10.0), "a victim inside takes dps over a second (%.2f)" % float(paid.get(1, 0.0)))
+	_check(not paid.has(2), "a victim outside takes nothing")
+	_check(is_equal_approx(pool.slow_of(1), 0.5) and is_equal_approx(pool.slow_of(2), 1.0), "slow applies inside only")
+	_check(is_equal_approx(pool.alpha_of(id, 1.0), 1.0) and is_equal_approx(pool.alpha_of(id, 3.0), 0.5), "alpha holds then fades over fade_seconds")
+	pool.tick(4.0, 3.0)
+	_check(pool.areas.is_empty() and events.back() == -id, "it ends at its lifetime and says so")
+	pool.tick(4.1, 0.1)
+	_check(is_equal_approx(float(paid.get(1, 0.0)), 10.0) and is_equal_approx(pool.slow_of(1), 1.0), "an ended puddle neither hurts nor slows")
+
+	var a := pool.add(profile, Vector3(20, 0, 0), 10.0, 7)
+	var _b := pool.add(profile, Vector3(21, 0, 0), 10.1, 7)
+	var _c := pool.add(profile, Vector3(22, 0, 0), 10.2, 7)
+	_check(pool.count(&"goo", 7) == 2 and not pool.areas.has(a), "per-owner cap evicts that owner's oldest")
+	var _d := pool.add(profile, Vector3(23, 0, 0), 10.3, 8)
+	var _e := pool.add(profile, Vector3(24, 0, 0), 10.4, 8)
+	_check(pool.count(&"goo") == 3 and pool.count(&"goo", 8) == 2, "global cap holds at 3")
+
+	pool.clear()
+	var dropped := 0
+	var last := Vector3.ZERO
+	for i in range(40):
+		last = Vector3(float(i) * 0.25, 0, 0)
+		if pool.trail(profile, 5, last, float(i) * 0.1) != 0:
+			dropped += 1
+	_check(dropped == 5 and pool.count(&"goo", 5) == 2, "a trail drops every 2 m: 5 over 10 m, 2 alive under the owner cap (got %d)" % dropped)
+	pool.end_trail(5)
+	_check(pool.trail(profile, 5, last, 99.0) != 0, "after end_trail the next step drops at once")
+	var tr := pool.add(profile, Vector3.ZERO, 0.0, 9, -1.0, profile.trail_radius, profile.trail_seconds)
+	_check(is_equal_approx(float((pool.areas[tr] as Dictionary)["radius"]), 1.0), "trail puddles use trail radius")
+
+	var ramp := DotHazardProfile.new()
+	ramp.grow_seconds = 1.0
+	var rp := DotHazardPool.new()
+	var rid := rp.add(ramp, Vector3.ZERO, 0.0, 0, 3.0)
+	_check(is_equal_approx(rp.radius_at(rid, 0.0), ramp.radius * ramp.start_fraction) and is_equal_approx(rp.radius_at(rid, 5.0), ramp.radius), "a puddle spreads from 20% to full over its first second")
+	var got := DotHazardProfile.from_values({"radius": 99999, "dps": 5, "kind": "oil", "bogus": 1})
+	_check(got.radius == 50.0 and got.dps == 5.0 and got.kind == &"oil", "from_values clamps and ignores unknown keys")
+	var screen := DotEffectDef.screen_impair(&"goo_blind", 320, 3)
+	_check(screen.stacking == DotEffectDef.Stacking.STACK and screen.max_stacks == 3 and "screen_impair" in screen.tags, "screen_impair is a stacking tagged status")
 
 
 # --- Harness ---------------------------------------------------------------
