@@ -137,6 +137,26 @@ func _test_revive() -> void:
 		"and cannot start again while they are down"
 	)
 
+	_check_shared_revive()
+
+	# Defibrillation.
+	m.stand_up(5, true)
+	m.on_death(5)
+	_check(m.downed_state(5).is_dead(), "an entity that died is dead")
+	var defib := m.defibrillate(5, 2)
+	_check(defib.ok, "and can be brought back")
+	_check(not m.downed_state(5).is_dead(), "and is up")
+	m.rules.downed_defib_health = 0.0
+	m.on_death(6)
+	_check(
+		not m.defibrillate(6).ok,
+		"in a game that has it — one that does not says so rather than silently doing nothing"
+	)
+
+	m.queue_free()
+
+
+func _check_shared_revive() -> void:
 	# Two pairs of hands, when the rules say they count. Before, a second begin_revive
 	# replaced the first reviver and `revivers` stayed 1: downed_revive_scales did nothing.
 	var shared := _manager(true)
@@ -164,22 +184,6 @@ func _test_revive() -> void:
 	_check(shared.downed_state(1).state == DotDowned.State.DOWN,
 		"and when the last one lets go the revive stops")
 	shared.queue_free()
-
-	# Defibrillation.
-	m.stand_up(5, true)
-	m.on_death(5)
-	_check(m.downed_state(5).is_dead(), "an entity that died is dead")
-	var defib := m.defibrillate(5, 2)
-	_check(defib.ok, "and can be brought back")
-	_check(not m.downed_state(5).is_dead(), "and is up")
-	m.rules.downed_defib_health = 0.0
-	m.on_death(6)
-	_check(
-		not m.defibrillate(6).ok,
-		"in a game that has it — one that does not says so rather than silently doing nothing"
-	)
-
-	m.queue_free()
 
 
 func _test_temp_health() -> void:
