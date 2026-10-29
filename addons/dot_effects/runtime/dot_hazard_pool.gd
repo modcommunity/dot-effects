@@ -2,10 +2,8 @@ class_name DotHazardPool
 extends RefCounted
 
 ## Ground hazards the server simulates and announces once: puddles of acid, goo or oil that hurt whoever stands in them.
-##
-## Damage leaves through [member damage_sink] (a game's combat manager); who stands where comes from
-## [member occupants]. Clients are told each puddle once ([signal added], [signal ended]) and draw it from
-## [method radius_at] and [method alpha_of], so nothing is sent per tick. No node, no autoload.
+## Damage leaves through [member damage_sink]; who stands where comes from [member occupants].
+## Clients hear each puddle once ([signal added], [signal ended]); nothing is sent per tick.
 
 ## A puddle appeared; the same arguments a game puts on the wire.
 signal added(id: int, kind: StringName, at: Vector3, radius: float, seconds: float)

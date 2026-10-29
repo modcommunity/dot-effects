@@ -16,7 +16,7 @@ func _manager(downed: bool = false) -> DotEffectManager:
 	return m
 
 
-# --- Downed ------------------------------------------------------------------
+# Downed
 
 func _test_downed() -> void:
 	_section("down rather than dead")
@@ -222,7 +222,7 @@ func _test_temp_health() -> void:
 	m.queue_free()
 
 
-# --- The wire ----------------------------------------------------------------
+# The wire
 
 func _test_wire_and_mirror() -> void:
 	_section("the wire and the mirror")
@@ -292,7 +292,7 @@ func _test_stack_scale() -> void:
 	_check(is_equal_approx(DotStackScale.fade_alpha(5, -1.0, 0.3), 1.0), "a negative step never darkens the other way")
 
 
-# --- Hazard pool ------------------------------------------------------------
+# Hazard pool
 
 func _test_hazard_pool() -> void:
 	_section("hazard pool: damage only inside, ramp, cap, lifetime, trail, slow")
@@ -373,7 +373,7 @@ func _test_hazard_pool() -> void:
 	_check(screen.stacking == DotEffectDef.Stacking.STACK and screen.max_stacks == 3 and "screen_impair" in screen.tags, "screen_impair is a stacking tagged status")
 
 
-# --- Harness ---------------------------------------------------------------
+# Harness
 
 func _section(title: String) -> void:
 	_section_count += 1
